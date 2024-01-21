@@ -54,26 +54,27 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint8_t Hum_Int,Hum_Dec,Temp_Int,Temp_Dec,Sum;
 
 void DHT11_Start (void)
 {
 	Set_Pin_Output (GPIOA, DHT11);
 	HAL_GPIO_WritePin (GPIOA, DHT11, 0);
-	delay (18000);
+	HAL_Delay (20);
 	Set_Pin_Input(GPIOA, DHT11);
 }
 
 uint8_t DHT11_Respuesta (void)
 {
 	uint8_t Response = 0;
-	delay (40);
+	HAL_Delay (40);
 	if (!(HAL_GPIO_ReadPin (GPIOA, DHT11)))
 	{
-		delay (80);
+		HAL_Delay (80);
 		if ((HAL_GPIO_ReadPin (GPIOA, DHT11))) Response = 1;
 		else Response = -1;
 	}
-	while ((HAL_GPIO_ReadPin (GPIOA, DHT11)));   // wait for the pin to go low
+	while ((HAL_GPIO_ReadPin (GPIOA, DHT11))); 
 
 	return Response;
 }
@@ -84,7 +85,7 @@ uint8_t DHT11_Read (void)
 	for (j=0;j<8;j++)
 	{
 		while (!(HAL_GPIO_ReadPin (GPIOA, DHT11_PIN)));
-		delay (40);
+		HAL_Delay (40);
 		if (!(HAL_GPIO_ReadPin (GPIOA, DHT11_PIN)))
 		{
 			i&= ~(1<<(7-j));
@@ -135,9 +136,18 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  DHT11_Start();
-
-  }
+	DHT11_Start();
+	Hum_Int=DHT11_Read();
+	Hum_Dec=DHT11_Read();
+	Temp_Int=DHT11_Read();
+	Temp_Dec=DHT11_Read();
+	Sum=DHT11_Read();
+	if (Hum_Int+Hum_Dec+Temp_Int+Temp_dec == Sum)
+	 {
+	    Temperatura= (float) Temp_Int + (float) (Temp_Dec/10.0);
+	    Humedad = (float) Hum_Int + (float) (Hum_Dec/10.0);
+	}
+      }
   /* USER CODE END 3 */
 }
 
