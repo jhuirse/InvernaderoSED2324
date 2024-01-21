@@ -55,22 +55,22 @@ static void MX_GPIO_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint8_t Hum_Int,Hum_Dec,Temp_Int,Temp_Dec,Sum;
-
+float Temperatura, Humedad;
 void DHT11_Start (void)
 {
 	Set_Pin_Output (GPIOA, DHT11);
 	HAL_GPIO_WritePin (GPIOA, DHT11, 0);
-	HAL_Delay (20);
+	delay(20);
 	Set_Pin_Input(GPIOA, DHT11);
 }
 
 uint8_t DHT11_Respuesta (void)
 {
 	uint8_t Response = 0;
-	HAL_Delay (40);
+	delay (40);
 	if (!(HAL_GPIO_ReadPin (GPIOA, DHT11)))
 	{
-		HAL_Delay (80);
+		delay (80);
 		if ((HAL_GPIO_ReadPin (GPIOA, DHT11))) Response = 1;
 		else Response = -1;
 	}
@@ -137,14 +137,14 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	DHT11_Start();
-	if (DHT11_Respuesta)
+	if (DHT11_Respuesta())
 	{
 	  Hum_Int=DHT11_Read();
 	  Hum_Dec=DHT11_Read();
 	  Temp_Int=DHT11_Read();
 	  Temp_Dec=DHT11_Read();
 	  Sum=DHT11_Read();
-	  if (Hum_Int+Hum_Dec+Temp_Int+Temp_dec == Sum)
+	  if (Hum_Int+Hum_Dec+Temp_Int+Temp_Dec == Sum)
 	   {
 	      Temperatura= (float) Temp_Int + (float) (Temp_Dec/10.0);
 	      Humedad = (float) Hum_Int + (float) (Hum_Dec/10.0);
