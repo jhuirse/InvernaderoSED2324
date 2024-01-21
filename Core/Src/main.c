@@ -137,17 +137,20 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	DHT11_Start();
-	Hum_Int=DHT11_Read();
-	Hum_Dec=DHT11_Read();
-	Temp_Int=DHT11_Read();
-	Temp_Dec=DHT11_Read();
-	Sum=DHT11_Read();
-	if (Hum_Int+Hum_Dec+Temp_Int+Temp_dec == Sum)
-	 {
-	    Temperatura= (float) Temp_Int + (float) (Temp_Dec/10.0);
-	    Humedad = (float) Hum_Int + (float) (Hum_Dec/10.0);
-	}
-      }
+	if (DHT11_Respuesta)
+	{
+	  Hum_Int=DHT11_Read();
+	  Hum_Dec=DHT11_Read();
+	  Temp_Int=DHT11_Read();
+	  Temp_Dec=DHT11_Read();
+	  Sum=DHT11_Read();
+	  if (Hum_Int+Hum_Dec+Temp_Int+Temp_dec == Sum)
+	   {
+	      Temperatura= (float) Temp_Int + (float) (Temp_Dec/10.0);
+	      Humedad = (float) Hum_Int + (float) (Hum_Dec/10.0);
+	   }
+         }
+  }
   /* USER CODE END 3 */
 }
 
