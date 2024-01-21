@@ -84,14 +84,14 @@ uint8_t DHT11_Read (void)
 	uint8_t i,j;
 	for (j=0;j<8;j++)
 	{
-		while (!(HAL_GPIO_ReadPin (GPIOA, DHT11_PIN)));
+		while (!(HAL_GPIO_ReadPin (GPIOA, DHT11)));
 		HAL_Delay (40);
-		if (!(HAL_GPIO_ReadPin (GPIOA, DHT11_PIN)))
+		if (!(HAL_GPIO_ReadPin (GPIOA, DHT11)))
 		{
 			i&= ~(1<<(7-j));
 		}
 		else i|= (1<<(7-j));
-		while ((HAL_GPIO_ReadPin (DHT11_PORT, DHT11_PIN)));
+		while ((HAL_GPIO_ReadPin (GPIOA, DHT11)));
 	}
 	return i;
 }
