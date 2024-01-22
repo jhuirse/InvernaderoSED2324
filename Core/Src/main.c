@@ -56,6 +56,8 @@ static void MX_GPIO_Init(void);
 /* USER CODE BEGIN 0 */
 uint8_t Hum_Int,Hum_Dec,Temp_Int,Temp_Dec,Sum;
 float Temperatura, Humedad;
+uint8_t flag_boton=0;
+uint32_t Tiempo_T2=0;
 
 void Set_Pin_Output(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 {
