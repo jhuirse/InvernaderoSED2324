@@ -115,6 +115,36 @@ uint8_t DHT11_Read (void)
 	}
 	return i;
 }
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+
+  if (GPIO_Pin == GPIO_PIN_0)
+  {
+    flag_boton = 1;
+    Tiempo_T2 = HAL_GetTick();
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, 1);
+    HAL_TIM_Base_Start_IT(&htim2);
+  }
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if (htim=&htim2)
+	{
+	if (flag_boton == 1)
+	  {
+	    uint32_t tiempo_transcurrido = HAL_GetTick() - Tiempo_T2;
+
+	    if (tiempo_transcurrido >= 3000)
+	    {
+	      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
+	      flag_boton = 0;
+	      HAL_TIM_Base_Stop_IT(&htim2);
+	    }
+	  }
+	}
+}
+
 /* USER CODE END 0 */
 
 /**
