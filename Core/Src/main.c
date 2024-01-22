@@ -40,7 +40,12 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
 
+TIM_HandleTypeDef htim1;
+TIM_HandleTypeDef htim2;
+TIM_HandleTypeDef htim3;
+TIM_HandleTypeDef htim4;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -48,17 +53,29 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_TIM1_Init(void);
+static void MX_ADC1_Init(void);
+static void MX_TIM3_Init(void);
+static void MX_TIM4_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
-
+ADC_ChannelConfTypeDef sConfig = {0};
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint8_t Hum_Int,Hum_Dec,Temp_Int,Temp_Dec,Sum;
-float Temperatura, Humedad;
+float Temperatura=0,
+float Humedad=0;
 uint8_t flag_boton=0;
 uint32_t Tiempo_T2=0;
+uint16_t Temperatura_pot,Humedad_pot,Luz;
 
+void delay (uint16_t time)
+{
+__HAL_TIM_SET_COUNTER(&htim1,0);
+while ((__HAL_TIM_GET_COUNTER(&htim1))<time);
+}
 void Set_Pin_Output(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 {
 	GPIO_InitTypeDef GPIO_InitStruct ={0};
@@ -177,8 +194,13 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_TIM1_Init();
+  MX_ADC1_Init();
+  MX_TIM3_Init();
+  MX_TIM4_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_TIM_Base_Start(&htim1);  //Empieza temporizador de DHT11
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -202,6 +224,39 @@ int main(void)
 	      Humedad = (float) Hum_Int + (float) (Hum_Dec/10.0);
 	   }
          }
+	sConfig.Channel = ADC_CHANNEL_1;
+	      HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+	 HAL_ADC_Start(&hadc1);
+	 if (HAL_ADC_PollForConversion(&hadc1,HAL_MAX_DELAY)==HAL_OK)
+	 {
+		 Temperatura_pot=HAL_ADC_GetValue(&hadc1);
+	 }
+	 HAL_ADC_Stop(&hadc1);
+
+
+	  sConfig.Channel = ADC_CHANNEL_2;
+	    HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+	 HAL_ADC_Start(&hadc1);
+	 if (HAL_ADC_PollForConversion(&hadc1,HAL_MAX_DELAY)==HAL_OK)
+	 {
+	 	Humedad_pot=HAL_ADC_GetValue(&hadc1);
+	 }
+	 HAL_ADC_Stop(&hadc1);
+
+	  sConfig.Channel = ADC_CHANNEL_5;
+	    HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+	 HAL_ADC_Start(&hadc1);
+	     HAL_ADC_ConfigChannel(&hadc1, &sConfig);
+	     HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+	     Luz=HAL_ADC_GetValue(&hadc1);
+	     HAL_ADC_Stop(&hadc1);
+
+	 if (Luz<1000)
+	 {
+		 HAL_GPIO_WritePin(GPIOD,GPIO_PIN_15,0);
+	 }
+	 else
+		 HAL_GPIO_WritePin(GPIOD,GPIO_PIN_15,1);
   }
   /* USER CODE END 3 */
 }
