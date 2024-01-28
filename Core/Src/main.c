@@ -32,6 +32,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define DHT11  GPIO_PIN_4
+#define SERVO_PIN GPIO_PIN_12 //PD12
+#define SERVO_TIMER_CHANNEL TIM_CHANNEL_1 // Canal 1 del Timer 4
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -56,8 +58,19 @@ static void MX_GPIO_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM3_Init(void);
-static void MX_TIM4_Init(void);
+
+static void MX_TIM4_Init(void)
+{
+sConfigOC.OCMode = TIM_OCMODE_PWM1;
+sConfigOC.Pulse = 1500; // Valor inicial del pulso PWM SERVO
+sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1);
+}
+
 static void MX_TIM2_Init(void);
+
 /* USER CODE BEGIN PFP */
 ADC_ChannelConfTypeDef sConfig = {0};
 /* USER CODE END PFP */
@@ -201,6 +214,7 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim1);  //Empieza temporizador de DHT11
+  HAL_TIM_Base_Start(&htim4);  // Inicia temporizador para el Servo
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -223,7 +237,23 @@ int main(void)
 	      Temperatura= (float) Temp_Int + (float) (Temp_Dec/10.0);
 	      Humedad = (float) Hum_Int + (float) (Hum_Dec/10.0);
 	   }
+
+	// Control del aspersor (servomotor)
+  	  if (Humedad < UMBRAL_HUMEDAD) // Ajusta el umbral según tus necesidades
+  	  {
+    	  // Mover a la derecha (puedes ajustar los valores)
+    	  for (x = 0; x < 2500; x = x + 1)
+   	   {
+    	    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, x);
+    	    HAL_Delay(1);
+    	  }
+    	  // Mover a la izquierda
+   	   for (x = 2500; x > 0; x = x - 1)
+    	  {
+        __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, x);
+        HAL_Delay(3);
          }
+	    
 	sConfig.Channel = ADC_CHANNEL_1;
 	      HAL_ADC_ConfigChannel(&hadc1, &sConfig);
 	 HAL_ADC_Start(&hadc1);
@@ -326,6 +356,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+/*Configure GPIO pin : PD12 (Servo control pin) */
+GPIO_InitStruct.Pin = SERVO_PIN;
+GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+GPIO_InitStruct.Pull = GPIO_NOPULL;
+GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+HAL_GPIO_Init(GPIOD, &GPIO_InitStruct); // GPIOD
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
