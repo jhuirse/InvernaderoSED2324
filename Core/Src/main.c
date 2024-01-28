@@ -61,9 +61,18 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_ADC1_Init(void);
-static void MX_TIM3_Init(void);
 
-static void MX_TIM4_Init(void)
+static void MX_TIM3_Init(void); //servo compuerta
+{
+sConfigOC.OCMode = TIM_OCMODE_PWM1;
+sConfigOC.Pulse = 1500; // Valor inicial del pulso PWM 
+sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
+}
+
+static void MX_TIM4_Init(void) //servo aspersor
 {
 sConfigOC.OCMode = TIM_OCMODE_PWM1;
 sConfigOC.Pulse = 1500; // Valor inicial del pulso PWM SERVO
@@ -257,7 +266,26 @@ int main(void)
         __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, x);
         HAL_Delay(3);
          }
-	    
+
+	//control compuerta (servomotor)
+	    if (Temperatura > 25.0) // umbral superior de temperatura
+    {
+      // Abrir la puerta (mover a la derecha)
+      for (x = 0; x < 2500; x = x + 1)
+      {
+        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, x);
+        HAL_Delay(5);
+      }
+    }
+    else if (Temperatura < 20.0) // umbral inferior de temperatura
+    {
+      // Cerrar la puerta (mover a la izquierda)
+      for (x = 2500; x > 0; x = x - 1)
+      {
+        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, x);
+        HAL_Delay(5);
+      }
+    }
 	sConfig.Channel = ADC_CHANNEL_1;
 	      HAL_ADC_ConfigChannel(&hadc1, &sConfig);
 	 HAL_ADC_Start(&hadc1);
