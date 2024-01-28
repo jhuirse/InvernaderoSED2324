@@ -32,8 +32,12 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define DHT11  GPIO_PIN_4
+
 #define SERVO_PIN GPIO_PIN_12 //PD12
 #define SERVO_TIMER_CHANNEL TIM_CHANNEL_1 // Canal 1 del Timer 4
+
+#define SERVO_PIN GPIO_PIN_6
+#define SERVO_TIMER_CHANNEL TIM_CHANNEL_1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -239,7 +243,7 @@ int main(void)
 	   }
 
 	// Control del aspersor (servomotor)
-  	  if (Humedad < UMBRAL_HUMEDAD) // Ajusta el umbral según tus necesidades
+  	  if (Humedad < 1500) // Ajusta el umbral según tus necesidades
   	  {
     	  // Mover a la derecha (puedes ajustar los valores)
     	  for (x = 0; x < 2500; x = x + 1)
@@ -357,12 +361,20 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-/*Configure GPIO pin : PD12 (Servo control pin) */
-GPIO_InitStruct.Pin = SERVO_PIN;
+/*Configure GPIO pin : PD12 (Servo aspersor) */
+GPIO_InitStruct.Pin = GPIO_PIN_12;
 GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
 GPIO_InitStruct.Pull = GPIO_NOPULL;
 GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 HAL_GPIO_Init(GPIOD, &GPIO_InitStruct); // GPIOD
+
+/*Configure GPIO pin : PA6 (Servo compuerta) */
+GPIO_InitStruct.Pin = GPIO_PIN_6;
+GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+GPIO_InitStruct.Pull = GPIO_NOPULL;
+GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
