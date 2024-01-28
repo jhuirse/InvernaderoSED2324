@@ -281,7 +281,7 @@ int main(void)
 	  
 
 	// Control del aspersor (servomotor)
-  	  if (Humedad < 1500) // Ajusta el umbral según tus necesidades
+  	  if (Humedad < 60.0) // Ajusta el umbral según tus necesidades
   	  {
     	  // Mover a la derecha (puedes ajustar los valores)
     	  for (x = 0; x < 2500; x = x + 1)
@@ -297,7 +297,7 @@ int main(void)
          }
 
 	//control compuerta (servomotor)
-	    if (Temperatura > 25.0) // umbral superior de temperatura
+	    if (Temperatura > 24.0) // umbral superior de temperatura
     {
       // Abrir la puerta (mover a la derecha)
       for (x = 0; x < 2500; x = x + 1)
@@ -315,12 +315,12 @@ int main(void)
         HAL_Delay(5);
       }
     }
-	 if (Luz<1000)
+	 if (Luz<100.0)
 	 {
-		 HAL_GPIO_WritePin(GPIOD,GPIO_PIN_15,0);
+		 HAL_GPIO_WritePin(GPIOD,GPIO_PIN_15,1);
 	 }
 	 else
-		 HAL_GPIO_WritePin(GPIOD,GPIO_PIN_15,1);
+		 HAL_GPIO_WritePin(GPIOD,GPIO_PIN_15,0);
   }
   /* USER CODE END 3 */
 }
