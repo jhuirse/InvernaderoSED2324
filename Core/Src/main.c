@@ -66,35 +66,7 @@ static void MX_DMA_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_ADC1_Init(void);
 
-static void MX_TIM3_Init(void) //servo compuerta
-{
-sConfigOC.OCMode = TIM_OCMODE_PWM1;
-sConfigOC.Pulse = 1500; // Valor inicial del pulso PWM 
-sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
-HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
-}
 
-static void MX_TIM4_Init(void) //servo aspersor
-{
-sConfigOC.OCMode = TIM_OCMODE_PWM1;
-sConfigOC.Pulse = 1500; // Valor inicial del pulso PWM SERVO
-sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
-HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1);
-}
-static void MX_DMA_Init(void)
-{
-
-/* DMA controller clock enable */ 
-HAL_RCC_DMA2_CLK_ENABLE();
-/* DMA interrupt init */
-/* DMA2 Stream@_IRQn interrupt configuration */ 
-NVIC_SetPriority(DMA2_Stream@_IRQn, 0, 0); 
-HAL_NVIC_EnableIRQ(DMA2_Stream@_IRQn);
-}
 
 static void MX_TIM2_Init(void);
 
@@ -316,7 +288,7 @@ int main(void)
         HAL_Delay(5);
       }
     }
-    else if (Temperatura < 20.0) // umbral inferior de temperatura
+    else if (Temperatura < 18.0) // umbral inferior de temperatura
     {
       // Cerrar la puerta (mover a la izquierda)
       for (x = 2500; x > 0; x = x - 1)
@@ -325,7 +297,7 @@ int main(void)
         HAL_Delay(5);
       }
     }
-	 if (Luz<100.0)
+	 if (Luz<100.0)           //100 Representa 10.000 luxes
 	 {
 		 HAL_GPIO_WritePin(GPIOD,GPIO_PIN_15,1);
 	 }
@@ -538,6 +510,26 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 2 */
 
+}
+
+static void MX_TIM3_Init(void) //servo compuerta
+{
+sConfigOC.OCMode = TIM_OCMODE_PWM1;
+sConfigOC.Pulse = 1500; // Valor inicial del pulso PWM 
+sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
+}
+
+static void MX_TIM4_Init(void) //servo aspersor
+{
+sConfigOC.OCMode = TIM_OCMODE_PWM1;
+sConfigOC.Pulse = 1500; // Valor inicial del pulso PWM SERVO
+sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1);
 }
 /**
   * Enable DMA controller clock
