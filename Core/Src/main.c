@@ -31,7 +31,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define DHT11  GPIO_PIN_4
+
+//#define DHT11  GPIO_PIN_4
 
 #define SERVO_PIN GPIO_PIN_12 //PD12
 #define SERVO_TIMER_CHANNEL TIM_CHANNEL_1 // Canal 1 del Timer 4
@@ -47,11 +48,13 @@
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
 
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -59,10 +62,11 @@ TIM_HandleTypeDef htim4;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_ADC1_Init(void);
 
-static void MX_TIM3_Init(void); //servo compuerta
+static void MX_TIM3_Init(void) //servo compuerta
 {
 sConfigOC.OCMode = TIM_OCMODE_PWM1;
 sConfigOC.Pulse = 1500; // Valor inicial del pulso PWM 
@@ -90,12 +94,14 @@ ADC_ChannelConfTypeDef sConfig = {0};
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t Hum_Int,Hum_Dec,Temp_Int,Temp_Dec,Sum;
+//uint8_t Hum_Int,Hum_Dec,Temp_Int,Temp_Dec,Sum;   //Variables de lectura de DHT11
 float Temperatura=0,
 float Humedad=0;
+float Luz=0;
 uint8_t flag_boton=0;
 uint32_t Tiempo_T2=0;
-uint16_t Temperatura_pot,Humedad_pot,Luz;
+uint16_t Temperatura_pot,Humedad_pot,LDR,resultados[3];
+const int adcCanales=sizeof(resultados)/sizeof(resultados[0]); //Numero Canales ADC
 
 void delay (uint16_t time)
 {
@@ -162,7 +168,6 @@ uint8_t DHT11_Read (void)
 }
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-
   if (GPIO_Pin == GPIO_PIN_0)
   {
     flag_boton = 1;
@@ -220,6 +225,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_TIM1_Init();
   MX_ADC1_Init();
   MX_TIM3_Init();
@@ -237,7 +243,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	DHT11_Start();
+	/*DHT11_Start();      //Sensor DHT11 no utilizado
 	if (DHT11_Respuesta())
 	{
 	  Hum_Int=DHT11_Read();
@@ -250,6 +256,13 @@ int main(void)
 	      Temperatura= (float) Temp_Int + (float) (Temp_Dec/10.0);
 	      Humedad = (float) Hum_Int + (float) (Hum_Dec/10.0);
 	   }
+    */
+
+	  HAL_ADC_Start_DMA(&hadc1,(uint32_t*)resultados,adcCanales);
+	  delay(1000);
+	  Temperatura_pot=resultados[0];
+	  Humedad_pot=resultados[1];
+	  LDR=resultados[2];
 
 	// Control del aspersor (servomotor)
   	  if (Humedad < 1500) // Ajusta el umbral según tus necesidades
@@ -286,33 +299,6 @@ int main(void)
         HAL_Delay(5);
       }
     }
-	sConfig.Channel = ADC_CHANNEL_1;
-	      HAL_ADC_ConfigChannel(&hadc1, &sConfig);
-	 HAL_ADC_Start(&hadc1);
-	 if (HAL_ADC_PollForConversion(&hadc1,HAL_MAX_DELAY)==HAL_OK)
-	 {
-		 Temperatura_pot=HAL_ADC_GetValue(&hadc1);
-	 }
-	 HAL_ADC_Stop(&hadc1);
-
-
-	  sConfig.Channel = ADC_CHANNEL_2;
-	    HAL_ADC_ConfigChannel(&hadc1, &sConfig);
-	 HAL_ADC_Start(&hadc1);
-	 if (HAL_ADC_PollForConversion(&hadc1,HAL_MAX_DELAY)==HAL_OK)
-	 {
-	 	Humedad_pot=HAL_ADC_GetValue(&hadc1);
-	 }
-	 HAL_ADC_Stop(&hadc1);
-
-	  sConfig.Channel = ADC_CHANNEL_5;
-	    HAL_ADC_ConfigChannel(&hadc1, &sConfig);
-	 HAL_ADC_Start(&hadc1);
-	     HAL_ADC_ConfigChannel(&hadc1, &sConfig);
-	     HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-	     Luz=HAL_ADC_GetValue(&hadc1);
-	     HAL_ADC_Stop(&hadc1);
-
 	 if (Luz<1000)
 	 {
 		 HAL_GPIO_WritePin(GPIOD,GPIO_PIN_15,0);
