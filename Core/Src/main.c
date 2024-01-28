@@ -108,6 +108,16 @@ void delay (uint16_t time)
 __HAL_TIM_SET_COUNTER(&htim1,0);
 while ((__HAL_TIM_GET_COUNTER(&htim1))<time);
 }
+float to_lux(uint16_t LDR){
+	return((float) LDR/4095)*(250-50)+50;
+}
+float to_celsius(uint16_t tx) { 
+	return ((float) tx/4095)*(40-18)+18;
+}
+
+float to_percent(uint16_t hum) { 
+	return ((float) hum/4095)*(70-50)+50;
+}
 void Set_Pin_Output(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 {
 	GPIO_InitTypeDef GPIO_InitStruct ={0};
@@ -263,6 +273,12 @@ int main(void)
 	  Temperatura_pot=resultados[0];
 	  Humedad_pot=resultados[1];
 	  LDR=resultados[2];
+	  
+	  Temperatura=to_celsius(Temperatura_pot);
+	  Humedad=to_percent(Humedad_pot);
+	  Luz=to_lux(LDR);
+
+	  
 
 	// Control del aspersor (servomotor)
   	  if (Humedad < 1500) // Ajusta el umbral según tus necesidades
