@@ -85,6 +85,16 @@ sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
 HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
 HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1);
 }
+static void MX_DMA_Init(void)
+{
+
+/* DMA controller clock enable */ 
+HAL_RCC_DMA2_CLK_ENABLE();
+/* DMA interrupt init */
+/* DMA2 Stream@_IRQn interrupt configuration */ 
+NVIC_SetPriority(DMA2_Stream@_IRQn, 0, 0); 
+HAL_NVIC_EnableIRQ(DMA2_Stream@_IRQn);
+}
 
 static void MX_TIM2_Init(void);
 
