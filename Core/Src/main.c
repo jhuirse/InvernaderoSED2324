@@ -225,7 +225,8 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim1);  //Empieza temporizador de DHT11
-  HAL_TIM_Base_Start(&htim4);  // Inicia temporizador para el Servo
+  HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -235,6 +236,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	int x;
 	/*DHT11_Start();      //Sensor DHT11 no utilizado
 	if (DHT11_Respuesta())
 	{
@@ -303,6 +305,7 @@ int main(void)
 	 }
 	 else
 		 HAL_GPIO_WritePin(GPIOD,GPIO_PIN_15,0);
+  }
   }
   /* USER CODE END 3 */
 }
